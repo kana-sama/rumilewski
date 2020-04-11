@@ -15,7 +15,7 @@ import Control.Monad.IO.Class (liftIO)
 import qualified Network.Wreq as Wreq (get, responseBody)
 import qualified Web.Scotty as Scotty (scotty, get, file)
 
-import Control.Concurrent (newMVar, readMVar, modifyMVar_)
+import Control.Concurrent (newMVar, readMVar, modifyMVar, modifyMVar_)
 import Control.Concurrent.Async (async, wait, forConcurrently)
 
 import Control.Lens ((^.))
@@ -61,7 +61,9 @@ buildBook target book = go [] [] book where
 main :: IO ()
 main = do
   cache <- newMVar []
+  counter <- newMVar 0
   Scotty.scotty 3000 $ Scotty.get "/rumilewski.pdf" do
+    liftIO $ print =<< modifyMVar counter (\x -> pure (x + 1, x + 1))
     actual <- liftIO $ fetchBook base
     cached <- liftIO $ readMVar cache
     when (cached /= actual) do

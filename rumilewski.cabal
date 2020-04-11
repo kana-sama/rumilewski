@@ -1,0 +1,45 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: bb61886a7fd963536f2d50664467e1059023281b24526bf1d4fc52e1c370b880
+
+name:           rumilewski
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/kana-sama/rumilewski#readme>
+homepage:       https://github.com/kana-sama/rumilewski#readme
+bug-reports:    https://github.com/kana-sama/rumilewski/issues
+author:         kana-sama
+maintainer:     andrew4chrome@gmail.com
+copyright:      2020 kana-sama
+license:        BSD3
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/kana-sama/rumilewski
+
+executable rumilewski-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_rumilewski
+  hs-source-dirs:
+      app
+  default-extensions: BlockArguments LambdaCase OverloadedStrings RecordWildCards
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      async
+    , base >=4.7 && <5
+    , bytestring
+    , lens
+    , process
+    , scalpel
+    , scotty
+    , temporary
+    , text
+    , wreq
+  default-language: Haskell2010

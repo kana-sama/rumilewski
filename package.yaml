@@ -1,0 +1,39 @@
+name:                rumilewski
+version:             0.1.0.0
+github:              "kana-sama/rumilewski"
+license:             BSD3
+author:              "kana-sama"
+maintainer:          "andrew4chrome@gmail.com"
+copyright:           "2020 kana-sama"
+
+extra-source-files:
+- README.md
+
+description:         Please see the README on GitHub at <https://github.com/kana-sama/rumilewski#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- scotty
+- wreq
+- bytestring
+- text
+- lens
+- scalpel
+- async
+- temporary
+- process
+
+default-extensions:
+- BlockArguments
+- LambdaCase
+- OverloadedStrings
+- RecordWildCards
+
+executables:
+  rumilewski-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N

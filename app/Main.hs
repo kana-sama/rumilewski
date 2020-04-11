@@ -13,7 +13,7 @@ import Control.Monad (when, void, guard)
 import Control.Monad.IO.Class (liftIO)
 
 import qualified Network.Wreq as Wreq (get, responseBody)
-import qualified Web.Scotty as Scotty (scotty, get, file)
+import qualified Web.Scotty as Scotty (scotty, get, file, setHeader)
 
 import Control.Concurrent (newMVar, readMVar, modifyMVar, modifyMVar_)
 import Control.Concurrent.Async (async, wait, forConcurrently)
@@ -27,10 +27,10 @@ import System.IO (hClose)
 import System.IO.Temp (withSystemTempFile)
 import System.Process (system)
 
-type URI = String
-type Book = [String]
+type URL = String
+type Book = [URL]
 
-fetchBook :: URI -> IO Book
+fetchBook :: URL -> IO Book
 fetchBook url = do
     pages <- fromMaybe [] <$> Scalpel.scrapeURL url do
       Scalpel.chroot ("div" @: [Scalpel.hasClass "entry-content"]) do
@@ -50,13 +50,14 @@ buildBook :: FilePath -> Book -> IO ()
 buildBook target book = go [] [] book where
   go downloads files [] = do
     for downloads wait
-    void $ system $ "pdfunite " <> unwords (reverse files) <> " " <> target
-  go downloads files (url : urls) = withSystemTempFile "chapter.pdf" \file handle -> do
-    download <- async do
-      pdf <- Wreq.get url
-      ByteString.Lazy.hPut handle (pdf ^. Wreq.responseBody)
-      hClose handle
-    go (download : downloads) (file : files) urls
+    void $ system $ unwords $ ["pdfunite"] <> reverse files <> [target]
+  go downloads files (chapter : chapters) =
+    withSystemTempFile "chapter.pdf" \file handle -> do
+      download <- async do
+        pdf <- Wreq.get chapter
+        ByteString.Lazy.hPut handle (pdf ^. Wreq.responseBody)
+        hClose handle
+      go (download : downloads) (file : files) chapters
 
 main :: IO ()
 main = do
@@ -71,6 +72,7 @@ main = do
         actual <- fetchBook base
         buildBook "rumilewski.pdf" actual
         pure actual
+    Scotty.setHeader "Content-Type" "application/pdf"
     Scotty.file "rumilewski.pdf"
   where
     base = "https://henrychern.wordpress.com/2017/07/17/httpsbartoszmilewski-com20141028category-theory-for-programmers-the-preface/"
